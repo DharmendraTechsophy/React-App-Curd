@@ -3,14 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import  {BrowserRouter} from "react-router-dom"
 import User from './User'
-
+import App from './App'
 
 ReactDOM.render(
-   <>
-      <BrowserRouter>
-         <User />
-      </BrowserRouter>
-  </>
+  <App/>
   ,
   document.getElementById('root')
 );

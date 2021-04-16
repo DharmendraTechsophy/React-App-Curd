@@ -3,21 +3,22 @@ import { Route, Switch } from 'react-router'
 import Signup from './Signup'
 import Login from './Login'
 import MenuBar from './MenuBar'
+import ProtectedRoute from './ProtectedRoute'
+import ProtectedLogin from './ProtectedLogin'
+import AuthApi from './AuthApi'
 const User=()=>{
 
-    var name=""
-    function getName(name1){
-        name=name1;
-    }
+  
+    const Auth = react.useContext(AuthApi)
 
-    return( 
+    return(  
         <>
             <Switch>
-                <Route exact path="/" component={() => <Login name={getName} />}></Route>
-                <Route exact path="/signup" component={Signup}></Route>
-                <Route exact path="/student" component={()=><MenuBar name={name}/> }></Route>
-                <Route exact path="/university" component={()=><MenuBar name={name}/> }></Route>
-                <Route exact path="/join2" component={()=><MenuBar name={name}/> }></Route>
+                <ProtectedLogin exact path="/" auth={Auth.auth} component={Login}/>
+                <ProtectedLogin exact path="/signup" auth={Auth.auth} component={Signup}/>
+                <ProtectedRoute exact path="/student" auth={Auth.auth} component={MenuBar }/>
+                <ProtectedRoute exact path="/university" auth={Auth.auth} component={MenuBar }/>
+                <ProtectedRoute exact path="/join2" auth={Auth.auth} component={MenuBar }/>
             </Switch>
         </>
     );
