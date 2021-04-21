@@ -6,7 +6,7 @@ import TextField from 'material-ui/TextField';
 import Axios from 'axios';
 import { NavLink } from "react-router-dom"
 import Grid from '@material-ui/core/Grid'
-import { Redirect, Route,useHistory } from "react-router-dom";
+import {useHistory } from "react-router-dom";
 
 const Signup = () => {
 

@@ -1,5 +1,5 @@
 import react from 'react'
-import { Route, Switch } from 'react-router'
+import {Switch } from 'react-router'
 import Signup from './Signup'
 import Login from './Login'
 import MenuBar from './MenuBar'

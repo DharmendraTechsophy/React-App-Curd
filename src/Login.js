@@ -8,15 +8,16 @@ import Axios from 'axios';
 import { NavLink, useHistory } from "react-router-dom"
 import AuthApi from './AuthApi'
 import Cookies from 'js-cookie'
+
 const Login = () => {
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
   const Auth = react.useContext(AuthApi)
 
   function validateForm() {
-    return username.length > 0 && password.length > 0;
+    return email.length > 0 && email.length > 0;
   }
 
   const history = useHistory();
@@ -26,21 +27,25 @@ const Login = () => {
       Axios.post("http://localhost:9000/user/search", {
         firstName: "",
         lastName: "",
-        userName: username,
-        email: "",
+        userName: "",
+        email: email,
         password: password,
-        createdDate: "2021-04-14"
+        createdDate: ""
       }).then((response) => {
-        if (response.data == null)
+        console.log("token : "+response.data.token)
+        if (response.data.token == null)
           alert("Login Failed..")
         else {
           //cookies
           Auth.setAuth(true)
-          Cookies.set("user",response.data.firstName,{ expires: 7 })
+          Cookies.set("user", response.data.token,{ expires: 7 })
           //test
           console.log("Record : " + response.data)
           //redirect to student route
-          history.push("/student");
+          if(Cookies.get("user"))
+          {
+            history.push("/student")
+          }
         }
       });
     }
@@ -59,9 +64,9 @@ const Login = () => {
               title="Login"
             />
             <TextField
-              hintText="Enter your Username"
-              floatingLabelText="Username"
-              onChange={(e) => setUsername(e.target.value)}
+              hintText="Enter Email"
+              floatingLabelText="Email"
+              onChange={(e) => setEmail(e.target.value)}
             />
             <br />
             <TextField

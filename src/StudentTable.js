@@ -22,6 +22,8 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import axios from 'axios'
 import Alert from '@material-ui/lab/Alert';
+import Cookies from 'js-cookie'
+import Decode from 'jwt-decode'
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -42,17 +44,15 @@ const tableIcons = {
   ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
-
 // const api = axios.create({
 //   baseURL: `https://reqres.in/api`
 // })
 
+//const ids= Decode(Cookies.get("user")).id
+
 const api = axios.create({
-  baseURL: `http://localhost:9000/student`  
+  baseURL: `http://localhost:9000/student`
 })
-
-
-
 
 function validateEmail(email){
   const re = /^((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))$/;
@@ -66,7 +66,8 @@ function StudentTable() {
     {title: "Avatar", render: rowData => <Avatar maxInitials={1} size={40} round={true} name={rowData === undefined ? " " : rowData.name} />  },
     {title: "Name", field: "name"},
     {title: "email", field: "email"},
-    {title: "University Id", field: "UID",type:'numeric'}
+    {title: "University Id", field: "UID",type:'numeric'},
+
   ]
   const [data, setData] = useState([]); //table data
 
@@ -78,10 +79,12 @@ function StudentTable() {
     getData();
   }, [])
   async function getData(){
-    const alldata = await axios.get('http://localhost:9000/student/list')
-    console.log(alldata.data)
-    console.log("API : "+api)
-    setData(alldata.data)
+      
+      const alldata = await axios.get('http://localhost:9000/student/getbyidbyuser',{headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
+      setData(alldata.data)
+    
+    //console.log(alldata.data)
+  
   }
 
   // useEffect(() => { 
@@ -109,7 +112,7 @@ function StudentTable() {
       errorList.push("Please enter a valid email")
     }
     if(errorList.length < 1){
-      api.post("/update", newData)
+      api.post("/update", newData, {headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
       .then(res => {
         const dataUpdate = [...data];
         const index = oldData.tableData.id;
@@ -144,9 +147,9 @@ function StudentTable() {
     if(newData.email === undefined || validateEmail(newData.email) === false){
       errorList.push("Please enter a valid email")
     }
-
+    newData.user_id= 10
     if(errorList.length < 1){ //no error
-      api.post("/create", newData)
+      api.post("/createbyidbyuser", newData,{headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
       .then(res => {
         let dataToAdd = [...data];
         dataToAdd.push(newData);
@@ -172,7 +175,7 @@ function StudentTable() {
 
   const handleRowDelete = (oldData, resolve) => {
     
-    api.get("/delete/"+oldData.id)
+    api.get("/delete/"+oldData.id,{headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
       .then(res => {
         const dataDelete = [...data];
         const index = oldData.tableData.id;

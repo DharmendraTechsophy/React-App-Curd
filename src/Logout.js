@@ -1,7 +1,4 @@
 import React from "react";
-import {Route,Switch,NavLink} from "react-router-dom";
-
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import AuthApi from './AuthApi'
 import Cookies from 'js-cookie'
 import Button from '@material-ui/core/Button';

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import './App.css';
 import { forwardRef } from 'react';
 import Avatar from 'react-avatar';
@@ -22,7 +23,8 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import axios from 'axios'
 import Alert from '@material-ui/lab/Alert';
-
+import Cookies from 'js-cookie'
+import Decode from 'jwt-decode'
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
   Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -50,15 +52,16 @@ const tableIcons = {
 const api = axios.create({
   baseURL: `http://localhost:9000/university`  
 })
-
+//const ids= Decode(Cookies.get("user")).id
 
 function UniversityTable() {
 
   var columns = [
-    {title: "id", field: "id"},
+    {title: "id", field: "id",editable: 'never'},
     {title: "Avatar", render: rowData => <Avatar maxInitials={1} size={40} round={true} name={rowData === undefined ? " " : rowData.name} />  },
     {title: "Name", field: "name"},
-    {title: "location", field: "location"}
+    {title: "location", field: "location"},
+    
   ]
   const [data, setData] = useState([]); //table data
 
@@ -70,9 +73,8 @@ function UniversityTable() {
     getData();
   }, [])
   async function getData(){
-    const alldata = await axios.get('http://localhost:9000/university/list')
-    console.log(alldata.data)
-    console.log("API : "+api)
+    const alldata = await axios.get('http://localhost:9000/university/getbyidbyuser',{headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
+    //console.log(alldata.data)
     setData(alldata.data)
   }
 
@@ -97,7 +99,7 @@ function UniversityTable() {
       errorList.push("Please enter name")
     }
     if(errorList.length < 1){
-      api.post("/update", newData)
+      api.post("/update", newData,{headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
       .then(res => {
         const dataUpdate = [...data];
         const index = oldData.tableData.id;
@@ -128,10 +130,10 @@ function UniversityTable() {
     if(newData.name === undefined){
       errorList.push("Please enter first name")
     }
-   
+    newData.userId = 10
 
     if(errorList.length < 1){ //no error
-      api.post("/create", newData)
+      api.post("/createbyidbyuser", newData,{headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
       .then(res => {
         let dataToAdd = [...data];
         dataToAdd.push(newData);
@@ -139,6 +141,7 @@ function UniversityTable() {
         resolve()
         setErrorMessages([])
         setIserror(false)
+        getData()
       })
       .catch(error => {
         setErrorMessages(["Cannot add data. Server error!"])
@@ -156,7 +159,7 @@ function UniversityTable() {
 
   const handleRowDelete = (oldData, resolve) => {
     
-    api.get("/delete/"+oldData.id)
+    api.get("/delete/"+oldData.id,{headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
       .then(res => {
         const dataDelete = [...data];
         const index = oldData.tableData.id;

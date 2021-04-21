@@ -22,7 +22,7 @@ import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 import axios from 'axios'
 import Alert from '@material-ui/lab/Alert';
-
+import Cookies from 'js-cookie'
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
   Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -43,9 +43,9 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
 
-const api = axios.create({
-  baseURL: `http://localhost:9000/student/join2`  
-})
+// const api = axios.create({
+//   baseURL: `http://localhost:9000/student/join2`  
+// })
 
 
 function UniversityTable() {
@@ -65,7 +65,7 @@ function UniversityTable() {
     getData();
   }, [])
   async function getData(){
-    const alldata = await axios.get('http://localhost:9000/student/join2')
+    const alldata = await axios.get('http://localhost:9000/student/join2',{headers : {Authorization:`Bearer ${Cookies.get("user")}`}})
     console.log(alldata.data)
     setData(alldata.data)
   }
